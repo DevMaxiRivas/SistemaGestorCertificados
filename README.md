@@ -46,5 +46,11 @@ php artisan migrate
 ### 2. Crea la cuenta de administrador de FilamentPHP
 ```bash
 php artisan hexa:account --create
+
+```
+### 3. En Local (Funcionamiento muy lento?)
+```bash
+php artisan icons:cache
+
 ```
 

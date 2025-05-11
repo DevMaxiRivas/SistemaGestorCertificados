@@ -34,7 +34,7 @@ class PuntoVentaProveedorResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationGroup = 'Proveedores';
-    protected static ?string $navigationLabel = 'Puntos de Venta Proveedores';
+    protected static ?string $navigationLabel = 'Puntos de Venta';
     protected static ?string $label = 'Punto de Venta';
     protected static ?string $pluralLabel = 'Puntos de venta';
     protected static ?string $slug = 'puntos-venta-proveedores';
@@ -55,22 +55,33 @@ class PuntoVentaProveedorResource extends Resource
                     ->columns([
                         'sm' => 1,
                         'xl' => 2,
-                        '2xl' => 2,
+                        '2xl' => 4,
                     ])
                     ->schema([
                         Select::make('id_provincia')
-                            ->relationship('provincias', 'nombre')
+                            ->relationship('provincia', 'nombre')
                             ->required()
                             ->label('Provincia'),
                         Select::make('id_proveedor')
-                            ->relationship('proveedores', 'razon_social')
+                            ->relationship('proveedor', 'razon_social')
+                            ->searchable()
                             ->required()
                             ->label('Proveedor'),
+                        Select::make('activo')
+                            ->label('Estado')
+                            ->options([
+                                PuntoVentaProveedor::ACTIVO => 'Activo',
+                                PuntoVentaProveedor::INACTIVO => 'Inactivo',
+                            ])
+                            ->default(PuntoVentaProveedor::ACTIVO)
+                            ->required()
+                            ->reactive(),
                         TextInput::make('nro_pto_venta')
                             ->numeric()
                             ->required()
                             ->label('Número de punto de venta'),
                         TextInput::make('sucursal')
+                            ->columnSpan('full')
                             ->required()
                             ->label('Nombre de sucursal'),
                         TextInput::make('direccion')
@@ -106,10 +117,6 @@ class PuntoVentaProveedorResource extends Resource
                     ->label('Dirección')
                     ->searchable()
                     ->sortable(),
-                // TextColumn::make('created_at')
-                //     ->dateTime()
-                //     ->sortable()
-                //     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
@@ -135,8 +142,8 @@ class PuntoVentaProveedorResource extends Resource
     {
         return [
             'index' => Pages\ListPuntoVentaProveedors::route('/'),
-            'create' => Pages\CreatePuntoVentaProveedor::route('/create'),
-            'edit' => Pages\EditPuntoVentaProveedor::route('/{record}/edit'),
+            'create' => Pages\CreatePuntoVentaProveedor::route('/crear'),
+            'edit' => Pages\EditPuntoVentaProveedor::route('/{record}/editar'),
         ];
     }
 }

@@ -27,89 +27,109 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class RemitoResource extends Resource
 {
     protected static ?string $model = Remito::class;
+    // Atributos de la tabla
+    // 'id_proveedor',
+    // 'id_pto_venta_prov',
+    // 'nro_remito',
+    // 'id_pto_venta',
+    // 'nro_orden_compra',
+    // 'fecha_emision',
+    // 'fecha_recepcion',
+    // 'url_remito',
+    // 'observaciones',
+    // 'id_empleado',
+    // 'estado',
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationGroup = 'Pedidos';
+    protected static ?string $navigationLabel = 'Remitos';
+    protected static ?string $label = 'Remito';
+    protected static ?string $pluralLabel = 'Remitos';
+    protected static ?string $slug = 'remitos';
+
+    protected static ?int $navigationSort = 2;
+    protected static ?string $modelLabel = 'Remito';
+    protected static ?string $modelPluralLabel = 'Remitos';
+
     public static function form(Form $form): Form
     {
-        // Campos de la tabla
-        // 'id_proveedor',
-        // 'id_pto_venta_prov',
-        // 'nro_remito',
-        // 'id_pto_venta',
-        // 'nro_orden_compra',
-        // 'fecha_emision',
-        // 'fecha_recepcion',
-        // 'url_remito',
-        // 'observaciones',
-        // 'id_empleado',
-        // 'estado',
-        // 'activo',
-
         return $form
             ->schema([
                 Section::make()
                     ->columns([
                         'sm' => 1,
                         'xl' => 2,
-                        '2xl' => 3,
+                        '2xl' => 5,
                     ])
                     ->schema([
                         Select::make('id_proveedor')
-                            // ->relationship('proveedores', 'razon_social')
-                            ->options([
-                                '1' => 'Proveedor 1',
-                                '2' => 'Proveedor 2',
-                                '3' => 'Proveedor 3',
-                            ])
+                            ->relationship('proveedores', 'razon_social')
+                            ->searchable()
                             ->required()
+                            ->columnSpan([
+                                'sm' => 5,
+                                'xl' => 2,
+                                '2xl' => 2,
+                            ])
                             ->label('Proveedor'),
                         Select::make('id_pto_venta_prov')
-                            // ->relationship('puntos_venta_proveedores', 'nro_pto_venta')
-                            ->options([
-                                '1' => 'PV 1',
-                                '2' => 'PV 2',
-                                '3' => 'PV 3',
-                            ])
+                            ->relationship('puntos_venta_proveedores', 'nro_pto_venta')
+                            ->searchable()
                             ->required()
+                            ->columnSpan([
+                                'sm' => 5,
+                                'xl' => 1,
+                                '2xl' => 1,
+                            ])
                             ->label('Punto de venta proveedor'),
                         TextInput::make('nro_remito')
                             ->required()
-                            ->label('Número de remito'),
-                        Select::make('id_pto_venta')
-                            // ->relationship('punto_venta', 'nro_pto_venta')
-                            ->options([
-                                '1' => 'PV 1',
-                                '2' => 'PV 2',
-                                '3' => 'PV 3',
+                            ->columnSpan([
+                                'sm' => 5,
+                                'xl' => 2,
+                                '2xl' => 2,
                             ])
-                            ->required()
-                            ->label('Punto de venta'),
-                        TextInput::make('nro_orden_compra')
-                            ->required()
-                            ->label('Número de orden de compra'),
+                            ->label('Número de remito'),
                         DatePicker::make('fecha_emision')
                             ->required()
                             ->label('Fecha de emisión'),
                         DatePicker::make('fecha_recepcion')
                             ->required()
                             ->label('Fecha de recepción'),
+                        Select::make('id_pto_venta')
+                            ->relationship('punto_venta', 'nro_pto_venta')
+                            ->searchable()
+                            ->preload()
+                            ->required()
+                            ->label('Punto de venta'),
+                        TextInput::make('nro_orden_compra')
+                            ->required()
+                            ->columnSpan([
+                                'sm' => 5,
+                                'xl' => 1,
+                                '2xl' => 2,
+                            ])
+                            ->label('Número de orden de compra'),
+                        Textarea::make('observaciones')
+                            ->label('Observaciones')
+                            ->columnSpan('full'),
                         FileUpload::make('url_remito')
                             ->label('Remito')
                             ->required()
                             ->preserveFilenames()
+                            ->columnSpan('full')
                             ->directory('remitos')
                             ->acceptedFileTypes(['application/pdf'])
                             ->maxSize(1024),
-                        Textarea::make('observaciones')
-                            ->label('Observaciones')
-                            ->columnSpan([
-                                'sm' => 2,
-                            ]),
-                        // Select::make('id_empleado')
-                        //     ->relationship('empleado', 'name')
-                        //     ->required()
-                        //     ->label('Empleado'),
+                        FileUpload::make('url_remito')
+                            ->label('Certificados')
+                            ->required()
+                            ->preserveFilenames()
+                            ->columnSpan('full')
+                            ->directory('certificados')
+                            ->acceptedFileTypes(['application/pdf'])
+                            ->maxSize(1024),
                     ])
             ]);
     }
@@ -175,8 +195,8 @@ class RemitoResource extends Resource
     {
         return [
             'index' => Pages\ListRemitos::route('/'),
-            'create' => Pages\CreateRemito::route('/create'),
-            'edit' => Pages\EditRemito::route('/{record}/edit'),
+            'create' => Pages\CreateRemito::route('/crear'),
+            'edit' => Pages\EditRemito::route('/{record}/editar'),
         ];
     }
 }
