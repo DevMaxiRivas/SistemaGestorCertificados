@@ -15,10 +15,10 @@ return new class extends Migration
         Schema::create('remitos', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_proveedor');
-            
+
             $table->unsignedBigInteger('id_pto_venta_prov');
             $table->unsignedBigInteger('nro_remito');
-            
+
             $table->unsignedBigInteger('id_pto_venta');
             $table->unsignedBigInteger('nro_orden_compra');
 
@@ -33,13 +33,12 @@ return new class extends Migration
 
             $table->unsignedBigInteger('id_empleado')->nullable();
             $table->timestamps();
-            
+
             $table->foreign('id_pto_venta_prov')->references('id')->on('puntos_venta_proveedores');
             $table->foreign('id_pto_venta')->references('id')->on('puntos_venta');
             $table->foreign('id_proveedor')->references('id')->on('proveedores');
-            $table->foreign('id_empleado')->references('id')->on('users');
+            $table->foreign('id_empleado')->references('id')->on('users')->nullable();
         });
-        
     }
 
     /**

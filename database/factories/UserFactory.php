@@ -1,44 +1,46 @@
 <?php
+// database/factories/UserFactory.php
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use Carbon\Carbon;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
- */
 class UserFactory extends Factory
 {
     /**
-     * The current password being used by the factory.
+     * The name of the factory's corresponding model.
+     *
+     * @var string
      */
-    protected static ?string $password;
+    protected $model = User::class;
 
     /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
      */
-    public function definition(): array
+    public function definition()
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
+            'rol' => $this->faker->randomElement([
+                User::ADMINISTRADOR, 
+                User::GERENTE,
+                User::ENCARGADO_COMERCIAL,
+                User::ENCARGADO_REMITO,
+                User::PERSONAL_DEPOSITO,
+                User::EMPLEADO_SIN_ROL
+            ]),
+            'name' => $this->faker->name(),
+            'cuit' => $this->faker->numerify('###########'), // Genera un número de 11 dígitos
+            'telefono' => $this->faker->optional()->phoneNumber(),
+            'estado' => $this->faker->randomElement([User::BAJA, User::ALTA]),
+            'email' => $this->faker->unique()->safeEmail(),
+            'password' => Hash::make('password'),
+            'created_at' => $this->faker->dateTimeThisYear,
+            'updated_at' => Carbon::parse($this->faker->dateTimeThisYear)->addDays($this->faker->numberBetween(0, 10))
         ];
-    }
-
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
-    public function unverified(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
     }
 }
