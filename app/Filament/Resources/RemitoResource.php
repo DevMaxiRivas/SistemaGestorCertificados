@@ -5,8 +5,12 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\RemitoResource\Pages;
 use App\Filament\Resources\RemitoResource\RelationManagers;
 use App\Models\Remito;
+use App\Models\Proveedor;
+use App\Models\PuntoVenta;
+use App\Models\PuntoVentaProveedor;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 
 use Filament\Forms\Components\Section;
@@ -22,6 +26,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class RemitoResource extends Resource
@@ -64,9 +69,14 @@ class RemitoResource extends Resource
                     ])
                     ->schema([
                         Select::make('id_proveedor')
-                            ->relationship('proveedores', 'razon_social')
+                            ->relationship('proveedor', 'razon_social')
                             ->searchable()
+                            ->preload()
+                            ->live()
                             ->required()
+                            ->afterStateUpdated(
+                                fn(Get $get, callable $set) => $set('id_pto_venta_prov', null)
+                            )
                             ->columnSpan([
                                 'sm' => 5,
                                 'xl' => 2,
@@ -74,8 +84,12 @@ class RemitoResource extends Resource
                             ])
                             ->label('Proveedor'),
                         Select::make('id_pto_venta_prov')
-                            ->relationship('puntos_venta_proveedores', 'nro_pto_venta')
-                            ->searchable()
+                            ->options(
+                                fn(Get $get): Collection => PuntoVentaProveedor::where('id_proveedor', $get('id_proveedor'))
+                                    ->pluck('nro_pto_venta', 'id')
+                            )
+                            ->preload()
+                            ->live()
                             ->required()
                             ->columnSpan([
                                 'sm' => 5,
@@ -116,7 +130,6 @@ class RemitoResource extends Resource
                             ->columnSpan('full'),
                         FileUpload::make('url_remito')
                             ->label('Remito')
-                            ->required()
                             ->preserveFilenames()
                             ->columnSpan('full')
                             ->directory('remitos')
@@ -124,7 +137,6 @@ class RemitoResource extends Resource
                             ->maxSize(1024),
                         FileUpload::make('url_remito')
                             ->label('Certificados')
-                            ->required()
                             ->preserveFilenames()
                             ->columnSpan('full')
                             ->directory('certificados')
@@ -138,11 +150,11 @@ class RemitoResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id_proveedor')
+                TextColumn::make('proveedor.razon_social')
                     ->label('Proveedor')
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('id_pto_venta_prov')
+                TextColumn::make('punto_venta_proveedor.nro_pto_venta')
                     ->label('Punto de venta proveedor')
                     ->sortable()
                     ->searchable(),
@@ -150,7 +162,7 @@ class RemitoResource extends Resource
                     ->label('Número de remito')
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('id_pto_venta')
+                TextColumn::make('punto_venta.nro_pto_venta')
                     ->label('Punto de venta')
                     ->sortable()
                     ->searchable(),
@@ -161,15 +173,11 @@ class RemitoResource extends Resource
                 TextColumn::make('fecha_emision')
                     ->label('Fecha de emisión')
                     ->sortable()
-                    ->dateTime(),
+                    ->date(),
                 TextColumn::make('fecha_recepcion')
                     ->label('Fecha de recepción')
                     ->sortable()
-                    ->dateTime(),
-                TextColumn::make('url_remito')
-                    ->label('Remito'),
-                TextColumn::make('observaciones')
-                    ->label('Observaciones'),
+                    ->date(),
             ])
             ->filters([
                 //
