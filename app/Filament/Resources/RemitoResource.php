@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\RemitoResource\Pages;
 use App\Filament\Resources\RemitoResource\RelationManagers;
+use App\Filament\Resources\RemitoResource\RelationManagers\DetallesRemitoRelationManager;
 use App\Models\Remito;
 use App\Models\Proveedor;
 use App\Models\PuntoVenta;
@@ -183,7 +184,17 @@ class RemitoResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->label('Editar'),
+                Tables\Actions\Action::make('Ver PDF')
+                    ->url(fn(Remito $record): string => $record->url_remito)
+                    ->icon('heroicon-o-eye')
+                    ->openUrlInNewTab()
+                    ->label('PDF'),
+                Tables\Actions\Action::make('Ver Certificado')
+                    ->url("/")
+                    ->icon('heroicon-o-eye')
+                    ->openUrlInNewTab()
+                    ->label('Certificado'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -195,7 +206,7 @@ class RemitoResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            DetallesRemitoRelationManager::class,
         ];
     }
 

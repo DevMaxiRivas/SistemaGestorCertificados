@@ -1,0 +1,8 @@
+# Creacion de Hexa-Usuario 
+php artisan hexa:account --create
+
+# Creación de Resource
+php artisan make=filament-resource [Modelo]Resource
+
+#Creacion de Relación para formulario
+php artisan make:filament-relation-manager
